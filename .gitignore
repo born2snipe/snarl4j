@@ -1,4 +1,5 @@
 *.i*
 build
 .gradle
+out
 
