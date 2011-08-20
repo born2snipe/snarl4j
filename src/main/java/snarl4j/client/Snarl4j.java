@@ -11,22 +11,24 @@ import java.net.Socket;
 public class Snarl4j {
     private String serverAddress;
     private int serverPort;
+    private String applicationId;
 
-    public Snarl4j() {
+    public Snarl4j(String applicationId) {
+        this.applicationId = applicationId;
         serverAddress = "localhost";
         serverPort = 9887;
     }
 
-    public void register(String applicationId) {
+    public void register() {
         CommandPacketBuilder builder = new CommandPacketBuilder("register", applicationId);
         sendPacket(builder);
     }
 
-    public void addClass(String applicationId, String classId) {
-        addClass(applicationId, classId, "");
+    public void addClass(String classId) {
+        addClass(classId, "");
     }
 
-    public void addClass(String applicationId, String classId, String title) {
+    public void addClass(String classId, String title) {
         CommandPacketBuilder builder = new CommandPacketBuilder("add_class", applicationId);
         builder.append("class", classId);
         if (title != null && title.trim().length() > 0) {
@@ -35,14 +37,14 @@ public class Snarl4j {
         sendPacket(builder);
     }
 
-    public void notification(String applicationId, String classId, String titleText, String text, int numberOfSecondsToDisplay) {
+    public void notification(String classId, String titleText, String text, int numberOfSecondsToDisplay) {
         CommandPacketBuilder builder = new CommandPacketBuilder("notification", applicationId);
         builder.append("class", classId).append("title", titleText).append("text", text);
         builder.append("timeout", String.valueOf(numberOfSecondsToDisplay));
         sendPacket(builder);
     }
 
-    public void unregister(String applicationId) {
+    public void unregister() {
         CommandPacketBuilder builder = new CommandPacketBuilder("unregister", applicationId);
         sendPacket(builder);
     }
@@ -53,16 +55,19 @@ public class Snarl4j {
             socket = new Socket();
             socket.setSoTimeout(1000);
             socket.connect(new InetSocketAddress(serverAddress, serverPort));
-            OutputStream outputStream = socket.getOutputStream();
-            outputStream.write(packetBuilder.toPacket());
-            outputStream.flush();
-            ServerResponse response = whatDidTheServerSay(socket);
-            handleServerResponse(packetBuilder, response);
+            sendThePacketToTheServer(packetBuilder, socket);
+            handleServerResponse(packetBuilder, whatDidTheServerSay(socket));
         } catch (IOException e) {
             throw new FailedCommandException(new String(packetBuilder.toPacket()).trim(), e);
         } finally {
             close(socket);
         }
+    }
+
+    private void sendThePacketToTheServer(CommandPacketBuilder packetBuilder, Socket socket) throws IOException {
+        OutputStream outputStream = socket.getOutputStream();
+        outputStream.write(packetBuilder.toPacket());
+        outputStream.flush();
     }
 
     private void handleServerResponse(CommandPacketBuilder packetBuilder, ServerResponse response) {
