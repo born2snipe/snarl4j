@@ -4,7 +4,7 @@ A simple api to interact with Snarl with Java using their network protocol.
 == Example Usage
   Snarl4j snarl4j = new Snarl4j("build-complete");
   snarl4j.register();
-  snarl4j.addClass("build_complete);
+  snarl4j.addClass("build_complete");
   snarl4j.notification("build_complete", "Build Complete", "All tests passed", 10);
   snarl4j.unregister();
 
