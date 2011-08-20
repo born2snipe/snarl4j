@@ -6,6 +6,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.net.InetSocketAddress;
+
 import static junit.framework.Assert.assertEquals;
 import static snarl4j.client.SnarlResponse.*;
 
@@ -28,6 +30,12 @@ public class Snarl4jTest {
         server.shouldRespondWith(SUCCESS);
 
         snarl4j = new Snarl4j();
+    }
+
+    @Test(expected = FailedCommandException.class)
+    public void shouldBlowUpIfThereIsAProblemConnectingToTheServer() {
+        snarl4j.setServerAddress(new InetSocketAddress("localhost", 1234));
+        snarl4j.register("appId");
     }
 
     @Test

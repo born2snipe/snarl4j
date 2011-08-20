@@ -5,8 +5,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 public class Snarl4j {
     private String serverAddress;
@@ -55,16 +55,16 @@ public class Snarl4j {
     private void sendPacket(CommandPacketBuilder packetBuilder) {
         Socket socket = null;
         try {
-            socket = new Socket(serverAddress, serverPort);
+            socket = new Socket();
+            socket.setSoTimeout(1000);
+            socket.connect(new InetSocketAddress(serverAddress, serverPort));
             OutputStream outputStream = socket.getOutputStream();
             outputStream.write(packetBuilder.toPacket());
             outputStream.flush();
             ServerResponse response = whatDidTheServerSay(socket);
             handleServerResponse(packetBuilder, response);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new FailedCommandException(new String(packetBuilder.toPacket()).trim(), e);
         } finally {
             close(socket);
         }
@@ -99,6 +99,11 @@ public class Snarl4j {
             } catch (IOException e) {
             }
         }
+    }
+
+    public void setServerAddress(InetSocketAddress serverAddress) {
+        this.serverAddress = serverAddress.getHostName();
+        this.serverPort = serverAddress.getPort();
     }
 
     private class ServerResponse {
