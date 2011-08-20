@@ -18,8 +18,7 @@ public class Snarl4j {
     }
 
     public void register(String applicationId) {
-        CommandPacketBuilder builder = new CommandPacketBuilder();
-        builder.append("action", "register").append("app", applicationId);
+        CommandPacketBuilder builder = new CommandPacketBuilder("register", applicationId);
         sendPacket(builder);
     }
 
@@ -28,8 +27,7 @@ public class Snarl4j {
     }
 
     public void addClass(String applicationId, String classId, String title) {
-        CommandPacketBuilder builder = new CommandPacketBuilder();
-        builder.append("action", "add_class").append("app", applicationId);
+        CommandPacketBuilder builder = new CommandPacketBuilder("add_class", applicationId);
         builder.append("class", classId);
         if (title != null && title.trim().length() > 0) {
             builder.append("title", title);
@@ -38,17 +36,14 @@ public class Snarl4j {
     }
 
     public void notification(String applicationId, String classId, String titleText, String text, int numberOfSecondsToDisplay) {
-        CommandPacketBuilder builder = new CommandPacketBuilder();
-        builder.append("action", "notification").append("app", applicationId);
+        CommandPacketBuilder builder = new CommandPacketBuilder("notification", applicationId);
         builder.append("class", classId).append("title", titleText).append("text", text);
         builder.append("timeout", String.valueOf(numberOfSecondsToDisplay));
         sendPacket(builder);
     }
 
     public void unregister(String applicationId) {
-        CommandPacketBuilder builder = new CommandPacketBuilder();
-        builder.append("action", "unregister");
-        builder.append("app", applicationId);
+        CommandPacketBuilder builder = new CommandPacketBuilder("unregister", applicationId);
         sendPacket(builder);
     }
 

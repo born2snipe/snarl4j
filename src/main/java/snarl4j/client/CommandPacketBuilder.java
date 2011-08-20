@@ -7,8 +7,9 @@ import java.util.Map;
 public class CommandPacketBuilder {
     private Map<String, String> dataValues = new LinkedHashMap<String, String>();
 
-    public CommandPacketBuilder() {
+    public CommandPacketBuilder(String actionName, String applicationId) {
         append("type", "SNP").append("version", "1.0");
+        append("action", actionName).append("app", applicationId);
     }
 
     public CommandPacketBuilder append(String data, String value) {
